@@ -79,8 +79,6 @@ def bits_to_ascii(bits):
 ```python
 from PIL import Image
 
-# Functions as described above...
-
 # Load both images
 map_img = Image.open("treasure_map.png").convert("RGB")
 data_img = Image.open("suspicious_chicken.png").convert("RGB")
@@ -103,16 +101,7 @@ print("Extracted flag:", flag)
 The decoded output gave us the flag:
 
 ```bash
-Extracted flag: squ1rrel{...hidden_text_here...}
+Extracted flag: squ1rrelctf{why_w0u1d_u_fo11ow_4_chicken}
 ```
 
----
 
-## 📝 Conclusion
-
-This was a clean and elegant steganography challenge that combined image-based navigation with LSB data hiding. The twist of using a **map to derive coordinates** made it especially interesting.
-
-> 🔍 This challenge reinforces why visual inspection and metadata correlation can be essential in digital forensics and CTF-style puzzles.
-
----
-```
