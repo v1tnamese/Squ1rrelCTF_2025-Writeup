@@ -1,58 +1,72 @@
-Writeup: Hidden Bits in the Chicken (Steganography Challenge)
-Challenge Description:
-We were given two images:
+Here's a well-formatted **GitHub-style markdown writeup (`README.md`)** for your challenge:
 
-🗺️ treasure_map.png: A black-and-white image hinting at "where" to look.
+---
 
-🐔 suspicious_chicken.png: A colorful image suspected of hiding something.
+```markdown
+# 🐔 Steganography Challenge: Suspicious Chicken
 
-The goal was to extract a hidden flag from suspicious_chicken.png using the "coordinates" from the treasure_map.png.
+## 🧩 Challenge Overview
 
-💡 Initial Observations
-The challenge likely uses LSB (Least Significant Bit) steganography.
+We were given two PNG images:
 
-The treasure map indicates which pixels contain useful data.
+- 📍 `treasure_map.png`: A black-and-white image acting as a guide.
+- 🐔 `suspicious_chicken.png`: A colorful image believed to contain hidden information.
 
-The actual hidden content is embedded in the LSBs of some color channel (Red, Green, or Blue) of suspicious_chicken.png.
+The objective was to extract a **hidden flag** using information from both images. It was clear from the context that this was a **Least Significant Bit (LSB) steganography** challenge.
 
-🔍 Strategy
-Identify all non-white pixels in the map image. These pixels act as coordinates.
+---
 
-For each such pixel, extract the LSB of the red channel at the same location in the chicken image.
+## 🔍 Approach
 
-Collect the bits and reconstruct bytes to retrieve ASCII characters.
+### 🗺️ Step 1: Extract Coordinates from the Map
 
-Print the decoded message — which turns out to be the flag.
+The map image acts as a filter to indicate **which pixels** from the chicken image are significant. Any pixel in `treasure_map.png` that is **not white** is treated as a coordinate to be read from the second image.
 
-🧠 Code Explanation
-1. Collecting Coordinates from the Map
-
+```python
 def get_coordinates(map_img):
     coords = []
     for y in range(height): 
         for x in range(width):
             r, g, b = map_img.getpixel((x, y))
-            if (r, g, b) != (255, 255, 255):  # skip white pixels
+            if (r, g, b) != (255, 255, 255):  # Non-white = valid point
                 coords.append((x, y))
     return coords
-This function parses through every pixel in treasure_map.png and selects coordinates that aren't white, marking them as important data points.
+```
 
-2. Extracting Bits
+---
 
+### 🎯 Step 2: Extract Bits from the Chicken Image
+
+At each valid coordinate (x, y), we read the **LSB of the red channel** from the suspicious chicken image.
+
+```python
 def extract_bits(image, coords, bit_plane=0, channel='red', bit_order='LSB'):
     bits = ""
     for (x, y) in coords:
         r, g, b = image.getpixel((x, y))
         if channel == 'red':
-            value = r
-        # ...
-        bit = (value >> bit_plane) & 1  # LSB extraction
+            color_value = r
+        # Select LSB or MSB from chosen channel
+        if bit_order == 'LSB':
+            bit = (color_value >> bit_plane) & 1
+        elif bit_order == 'MSB':
+            bit = (color_value >> (7 - bit_plane)) & 1
         bits += str(bit)
     return bits
-We extract bit 0 (LSB) of the Red channel for every coordinate, and collect the result in a string of bits.
+```
 
-3. Converting Bits to ASCII
+> 🔧 In our case, we chose:
+> - `bit_plane = 0` (LSB)
+> - `channel = 'red'`
+> - `bit_order = 'LSB'`
 
+---
+
+### 🧠 Step 3: Convert Bits to ASCII
+
+Bits are grouped into bytes (8 bits) and converted to ASCII to reveal the hidden flag.
+
+```python
 def bits_to_ascii(bits):
     flag = ""
     for i in range(0, len(bits), 8):
@@ -60,17 +74,49 @@ def bits_to_ascii(bits):
         if len(byte) == 8:
             flag += chr(int(byte, 2))
     return flag
-Every 8 bits are grouped to form a byte, then converted to characters.
+```
 
-🏁 Output
-Finally, after running the script:
+---
 
+## 🧪 Full Script
 
+```python
+from PIL import Image
+
+# Functions as described above...
+
+# Load both images
+map_img = Image.open("treasure_map.png").convert("RGB")
+data_img = Image.open("suspicious_chicken.png").convert("RGB")
+
+# Extract non-white coordinates from the map
+coords = get_coordinates(map_img)
+
+# Extract bits from chicken image
+bits = extract_bits(data_img, coords, bit_plane=0, channel='red', bit_order='LSB')
+
+# Decode to ASCII
 flag = bits_to_ascii(bits)
 print("Extracted flag:", flag)
-You’ll get the hidden flag in the format like squ1rrel{...} or similar.
+```
 
-✅ Conclusion
-This challenge is a creative combination of map-based coordinate selection and LSB steganography. By using one image as a navigation map and the other as the data carrier, it simulates a realistic and clever way to conceal information visually.
+---
 
-🔐 A great reminder: Not all secrets are encrypted — sometimes they're just... pixel-deep.
+## 🏁 Final Output
+
+The decoded output gave us the flag:
+
+```bash
+Extracted flag: squ1rrel{...hidden_text_here...}
+```
+
+---
+
+## 📝 Conclusion
+
+This was a clean and elegant steganography challenge that combined image-based navigation with LSB data hiding. The twist of using a **map to derive coordinates** made it especially interesting.
+
+> 🔍 This challenge reinforces why visual inspection and metadata correlation can be essential in digital forensics and CTF-style puzzles.
+
+---
+```
