@@ -1,8 +1,4 @@
-Here's a well-formatted **GitHub-style markdown writeup (`README.md`)** for your challenge:
 
----
-
-```markdown
 # 🐔 Steganography Challenge: Suspicious Chicken
 
 ## 🧩 Challenge Overview
