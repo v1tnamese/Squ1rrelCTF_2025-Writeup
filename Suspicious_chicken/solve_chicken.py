@@ -1,6 +1,6 @@
 from PIL import Image
 
-def extract_bits(image, coords, bit_plane=6, channel='red', bit_order='LSB', direction='row'):
+def extract_bits(image, coords, bit_plane=0, channel='red', bit_order='LSB', direction='row'):
     bits = ""
     for (x, y) in coords:
         r, g, b = image.getpixel((x, y))
